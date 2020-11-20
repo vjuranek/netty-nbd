@@ -21,12 +21,15 @@ public final class NbdClient {
             b.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
+                    //.option(ChannelOption.AUTO_READ, false)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
                             p.addLast(new LoggingHandler(LogLevel.INFO));
                             p.addLast(new NbdClientHandler());
+                            p.addLast(new HandshakeHandler());
+                            p.addLast(new OptionHandler());
                         }
                     });
 

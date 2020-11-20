@@ -4,10 +4,7 @@ import com.github.vjuranek.netty.nbd.protocol.Constants;
 import com.github.vjuranek.netty.nbd.protocol.Phase;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class NbdClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
@@ -19,7 +16,7 @@ public class NbdClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         switch (protocolPhase) {
             case HANDSHAKE:
                 handshakePhase(ctx, msg);
@@ -33,7 +30,6 @@ public class NbdClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        //ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
         ctx.flush();
     }
 
@@ -44,38 +40,22 @@ public class NbdClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     private void handshakePhase(ChannelHandlerContext ctx, ByteBuf msg) {
+        ChannelPipeline pipeline = ctx.pipeline();
+        ChannelHandlerContext c;
         long magic = msg.getLong(0);
+
         if (magic == Constants.NBD_MAGIC) {
-            doHandshake(ctx, msg);
-            sendOption(ctx, Constants.NBD_OPT_STRUCTURED_REPLY, new byte[]{});
+            c = ctx;
         } else if (magic == Constants.OPTION_REPLAY_MAGIC) {
-            handleOptionReply(msg, Constants.NBD_OPT_STRUCTURED_REPLY);
+            c = pipeline.context(HandshakeHandler.class);
         } else {
             throw new IllegalStateException(String.format("Unknown magic %x", magic));
         }
-    }
 
-    private void doHandshake(ChannelHandlerContext ctx, ByteBuf msg) {
-        long nbdMagic = msg.getLong(0);
-        long iHaveOpt = msg.getLong(8);
-        short flags = msg.getShort(16);
-
-        if (nbdMagic != Constants.NBD_MAGIC) {
-            throw new IllegalArgumentException(String.format("Expected NBDMAGIC, but got %x", nbdMagic));
+        if (c != null) {
+            c.fireChannelRead(msg);
+            sendOption(ctx, Constants.NBD_OPT_STRUCTURED_REPLY, new byte[]{});
         }
-
-        if (iHaveOpt != Constants.I_HAVE_OPT) {
-            throw new IllegalArgumentException(String.format("Expected IHAVEOPT, but got %x", iHaveOpt));
-        }
-
-        if ((flags & Constants.NBD_FLAG_FIXED_NEWSTYLE) == 0) {
-            throw new IllegalArgumentException(String.format("Unexpected flags %s", flags));
-        }
-
-        ByteBuf b = Unpooled.buffer(4);
-        b.writeInt(Constants.NBD_FLAG_C_FIXED_NEWSTYLE);
-        ChannelFuture f = ctx.writeAndFlush(b);
-        f.addListener(writeFailed);
     }
 
     private void sendOption(ChannelHandlerContext ctx, int option, byte[] data) {
@@ -89,27 +69,6 @@ public class NbdClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         ChannelFuture f = ctx.writeAndFlush(b);
         f.addListener(writeFailed);
-    }
-
-    private int handleOptionReply(ByteBuf msg, int expectedOption) {
-        long optionReplyMagic = msg.getLong(0);
-        int option = msg.getInt(8);
-        int reply = msg.getInt(12);
-        int replySize = msg.getInt(16);
-
-        if (optionReplyMagic != Constants.OPTION_REPLAY_MAGIC) {
-            throw new IllegalArgumentException(String.format("Expected option reply magic, but got %x", optionReplyMagic));
-        }
-
-        if (expectedOption != option) {
-            throw new IllegalStateException(String.format("Expected option for %x, but got for %x", expectedOption, option));
-        }
-
-        if (reply != Constants.NBD_REP_ACK) {
-            throw new IllegalStateException(String.format("Server doesn't accept option %x", option));
-        }
-
-        return replySize;
     }
 
     private final ChannelFutureListener writeFailed = (ChannelFuture future) -> {
