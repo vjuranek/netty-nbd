@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.Future;
 
 public final class NbdClient {
 
@@ -34,7 +35,8 @@ public final class NbdClient {
 
             f.channel().closeFuture().sync();
         } finally {
-            group.shutdownGracefully();
+            Future<?> f = group.shutdownGracefully();
+            f.syncUninterruptibly();
         }
     }
 }
