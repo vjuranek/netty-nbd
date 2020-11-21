@@ -44,18 +44,11 @@ public final class NbdClient {
         }
 
         ChannelFuture f = channel.pipeline().writeAndFlush(b);
-        f.addListener(writeFailed);
+        f.addListener(Utils.writeFailed);
         f.sync();
 
         return handler.getReply();
     }
-
-    private final ChannelFutureListener writeFailed = (ChannelFuture future) -> {
-        if (!future.isSuccess()) {
-            future.cause().printStackTrace();
-            future.channel().close();
-        }
-    };
 
     public static void main(String[] args) throws Exception {
         NbdClient client;

@@ -29,15 +29,8 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf> {
         ByteBuf b = Unpooled.buffer(4);
         b.writeInt(Constants.NBD_FLAG_C_FIXED_NEWSTYLE);
         ChannelFuture f = ctx.writeAndFlush(b);
-        f.addListener(writeFailed);
+        f.addListener(Utils.writeFailed);
 
         ctx.pipeline().remove(this);
     }
-
-    private final ChannelFutureListener writeFailed = (ChannelFuture future) -> {
-        if (!future.isSuccess()) {
-            future.cause().printStackTrace();
-            future.channel().close();
-        }
-    };
 }
