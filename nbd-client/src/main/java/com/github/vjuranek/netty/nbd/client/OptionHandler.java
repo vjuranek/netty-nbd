@@ -25,7 +25,16 @@ public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
         long optionReplyMagic = msg.getLong(0);
         int option = msg.getInt(8);
         int reply = msg.getInt(12);
+        assertReply(optionReplyMagic, option, reply);
 
+        int replySize = msg.getInt(16);
+        this.reply = new byte[replySize];
+        msg.readBytes(this.reply);
+
+        ctx.pipeline().remove(this);
+    }
+
+    private final void assertReply(long optionReplyMagic, int option, int reply) {
         if (optionReplyMagic != Constants.OPTION_REPLAY_MAGIC) {
             throw new IllegalArgumentException(String.format("Expected option reply magic, but got %x", optionReplyMagic));
         }
@@ -37,11 +46,5 @@ public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (reply != Constants.NBD_REP_ACK) {
             throw new IllegalStateException(String.format("Server doesn't accept option %x", option));
         }
-
-        int replySize = msg.getInt(16);
-        this.reply = new byte[replySize];
-        msg.readBytes(this.reply);
-
-        ctx.pipeline().remove(this);
     }
 }

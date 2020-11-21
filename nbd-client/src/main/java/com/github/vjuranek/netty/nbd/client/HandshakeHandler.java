@@ -13,7 +13,17 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf> {
         long nbdMagic = msg.getLong(0);
         long iHaveOpt = msg.getLong(8);
         short flags = msg.getShort(16);
+        assertReply(nbdMagic, iHaveOpt, flags);
 
+        ByteBuf b = Unpooled.buffer(4);
+        b.writeInt(Constants.NBD_FLAG_C_FIXED_NEWSTYLE);
+        ChannelFuture f = ctx.writeAndFlush(b);
+        f.addListener(Utils.writeFailed);
+
+        ctx.pipeline().remove(this);
+    }
+
+    private final void assertReply(long nbdMagic, long iHaveOpt, short flags) {
         if (nbdMagic != Constants.NBD_MAGIC) {
             throw new IllegalArgumentException(String.format("Expected NBDMAGIC, but got %x", nbdMagic));
         }
@@ -25,12 +35,5 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if ((flags & Constants.NBD_FLAG_FIXED_NEWSTYLE) == 0) {
             throw new IllegalArgumentException(String.format("Unexpected flags %s", flags));
         }
-
-        ByteBuf b = Unpooled.buffer(4);
-        b.writeInt(Constants.NBD_FLAG_C_FIXED_NEWSTYLE);
-        ChannelFuture f = ctx.writeAndFlush(b);
-        f.addListener(Utils.writeFailed);
-
-        ctx.pipeline().remove(this);
     }
 }
