@@ -3,34 +3,45 @@ package com.github.vjuranek.netty.nbd.client;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 
-public class OptionHandler extends ChannelInboundHandlerAdapter {
+public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        handleOptionReply((ByteBuf) msg, Constants.NBD_OPT_STRUCTURED_REPLY);
+    private final int option;
+    private byte[] reply = new byte[] {};
+
+    public OptionHandler(int option) {
+        this.option = option;
     }
 
-    private int handleOptionReply(ByteBuf msg, int expectedOption) {
+    public byte[] getReply() {
+        return reply;
+    }
+
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+
         long optionReplyMagic = msg.getLong(0);
         int option = msg.getInt(8);
         int reply = msg.getInt(12);
-        int replySize = msg.getInt(16);
 
         if (optionReplyMagic != Constants.OPTION_REPLAY_MAGIC) {
             throw new IllegalArgumentException(String.format("Expected option reply magic, but got %x", optionReplyMagic));
         }
 
-        if (expectedOption != option) {
-            throw new IllegalStateException(String.format("Expected option for %x, but got for %x", expectedOption, option));
+        if (this.option != option) {
+            throw new IllegalStateException(String.format("Expected option for %x, but got for %x", this.option, option));
         }
 
         if (reply != Constants.NBD_REP_ACK) {
             throw new IllegalStateException(String.format("Server doesn't accept option %x", option));
         }
 
-        return replySize;
+        int replySize = msg.getInt(16);
+        this.reply = new byte[replySize];
+        msg.readBytes(this.reply);
+
+        ctx.pipeline().remove(this);
     }
 }
