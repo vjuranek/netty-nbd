@@ -1,10 +1,12 @@
 package com.github.vjuranek.netty.nbd.client;
 
+import com.github.vjuranek.netty.nbd.client.command.OptionCommand;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
@@ -30,31 +32,17 @@ public final class NbdClient {
         this.channel = f.channel();
     }
 
-    private byte[] sendOption(int option, byte[] data) throws InterruptedException {
-        OptionHandler handler = new OptionHandler(option);
-        channel.pipeline().addLast(handler);
-
-        int len = 16 + data.length; // long + int + int + data length
-        ByteBuf b = Unpooled.buffer(len);
-        b.writeLong(Constants.I_HAVE_OPT);
-        b.writeInt(option);
-        b.writeInt(data.length);
-        if (data.length > 0) {
-            b.writeBytes(data);
-        }
-
-        ChannelFuture f = channel.pipeline().writeAndFlush(b);
-        f.addListener(Utils.writeFailed);
-        f.sync();
-
-        return handler.getReply();
+    public byte[] structuredReplyOption() throws InterruptedException {
+        OptionCommand structReply = new OptionCommand(this.channel, Constants.NBD_OPT_STRUCTURED_REPLY);
+        structReply.send();
+        return structReply.getReply();
     }
 
     public static void main(String[] args) throws Exception {
         NbdClient client;
         try {
             client = new NbdClient();
-            byte[] reply = client.sendOption(Constants.NBD_OPT_STRUCTURED_REPLY, new byte[] {});
+            byte[] reply = client.structuredReplyOption();
             System.out.println("REPLY: " + new String(reply));
         } catch(InterruptedException e) {
             shutdown();
