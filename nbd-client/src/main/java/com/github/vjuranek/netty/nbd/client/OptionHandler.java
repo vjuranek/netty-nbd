@@ -5,18 +5,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
 
 public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private final int option;
-    private byte[] reply = new byte[] {};
+    // TODO: hash map entry for capacity higher than one and concurrent options.
+    private final BlockingDeque<byte[]> reply = new LinkedBlockingDeque<>(1);
 
     public OptionHandler(int option) {
         this.option = option;
     }
 
-    public byte[] getReply() {
-        return reply;
+    public byte[] getReply() throws InterruptedException {
+        return reply.take();
     }
 
     @Override
@@ -28,8 +32,9 @@ public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
         assertReply(optionReplyMagic, option, reply);
 
         int replySize = msg.getInt(16);
-        this.reply = new byte[replySize];
-        msg.readBytes(this.reply);
+        byte[] content = new byte[replySize];
+        msg.readBytes(content);
+        this.reply.offer(content);
 
         ctx.pipeline().remove(this);
     }

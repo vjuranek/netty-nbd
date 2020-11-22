@@ -55,7 +55,6 @@ public final class NbdClient {
         try {
             client = new NbdClient();
             byte[] reply = client.sendOption(Constants.NBD_OPT_STRUCTURED_REPLY, new byte[] {});
-            Thread.sleep(1000);
             System.out.println("REPLY: " + new String(reply));
         } catch(InterruptedException e) {
             shutdown();
