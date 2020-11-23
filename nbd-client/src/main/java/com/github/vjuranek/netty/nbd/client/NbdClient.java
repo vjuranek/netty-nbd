@@ -1,6 +1,5 @@
 package com.github.vjuranek.netty.nbd.client;
 
-import com.github.vjuranek.netty.nbd.client.command.OptionCommand;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -33,7 +32,7 @@ public final class NbdClient {
     }
 
     public byte[] structuredReplyOption() throws InterruptedException {
-        OptionCommand structReply = new OptionCommand(this.channel, Constants.NBD_OPT_STRUCTURED_REPLY);
+        NbdOption structReply = new NbdOption(this.channel, Constants.NBD_OPT_STRUCTURED_REPLY);
         structReply.send();
         return structReply.getReply();
     }

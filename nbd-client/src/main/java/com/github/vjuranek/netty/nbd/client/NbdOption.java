@@ -1,22 +1,25 @@
-package com.github.vjuranek.netty.nbd.client.command;
+package com.github.vjuranek.netty.nbd.client;
 
-import com.github.vjuranek.netty.nbd.client.OptionHandler;
-import com.github.vjuranek.netty.nbd.client.Utils;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
-public class OptionCommand extends NbdCommand {
+public class NbdOption {
 
+    private final Channel channel;
     private final int option;
     private final OptionHandler handler;
 
-    public OptionCommand(Channel channel, int option) {
-        super(channel);
+    public NbdOption(Channel channel, int option) {
+        this.channel = channel;
         this.option = option;
         this.handler = new OptionHandler(option);
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 
     public void send() {
