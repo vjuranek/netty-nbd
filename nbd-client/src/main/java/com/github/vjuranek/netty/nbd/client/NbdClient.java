@@ -1,6 +1,8 @@
 package com.github.vjuranek.netty.nbd.client;
 
 import com.github.vjuranek.netty.nbd.protocol.Constants;
+import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
+import com.github.vjuranek.netty.nbd.protocol.command.NbdCmd;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -35,6 +37,11 @@ public final class NbdClient {
         NbdOption structReply = new NbdOption(this.channel, Constants.NBD_OPT_STRUCTURED_REPLY);
         structReply.send();
         return structReply.getReply();
+    }
+
+    public void close() {
+        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
+        cmd.send();
     }
 
     public static void main(String[] args) throws Exception {
