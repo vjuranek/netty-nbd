@@ -54,6 +54,8 @@ public final class NbdClient {
             System.out.println("REPLY: " + new String(reply));
             client.close();
         } catch(InterruptedException e) {
+            // no-op
+        } finally {
             shutdown();
         }
 
