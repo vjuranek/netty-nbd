@@ -40,8 +40,10 @@ public final class NbdClient {
     }
 
     public void close() {
-        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
-        cmd.send();
+//        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
+//        cmd.send();
+        NbdOption abort = new NbdOption(this.channel, Constants.NBD_OPT_ABORT);
+        abort.send();
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,6 +52,7 @@ public final class NbdClient {
             client = new NbdClient();
             byte[] reply = client.structuredReplyOption();
             System.out.println("REPLY: " + new String(reply));
+            client.close();
         } catch(InterruptedException e) {
             shutdown();
         }

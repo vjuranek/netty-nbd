@@ -16,7 +16,10 @@ public final class Constants {
 
     public static final long OPTION_REPLAY_MAGIC = 0x3e889045565a9L;
     public static final int NBD_REP_ACK = 1;
-    public static final int NBD_OPT_STRUCTURED_REPLY = 0x8;
+
+    // Options
+    public static final int NBD_OPT_ABORT = 2;
+    public static final int NBD_OPT_STRUCTURED_REPLY = 8;
 
     // NBD commands
     public static final short NBD_CMD_READ = 0;
