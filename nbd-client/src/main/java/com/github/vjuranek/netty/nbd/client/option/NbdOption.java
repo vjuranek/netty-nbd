@@ -1,7 +1,6 @@
-package com.github.vjuranek.netty.nbd.client;
+package com.github.vjuranek.netty.nbd.client.option;
 
-import com.github.vjuranek.netty.nbd.client.option.AssertHandler;
-import com.github.vjuranek.netty.nbd.client.option.OptionHandler;
+import com.github.vjuranek.netty.nbd.client.Utils;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

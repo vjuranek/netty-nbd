@@ -1,8 +1,7 @@
 package com.github.vjuranek.netty.nbd.client;
 
+import com.github.vjuranek.netty.nbd.client.option.NbdOption;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
-import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
-import com.github.vjuranek.netty.nbd.protocol.command.NbdCmd;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
