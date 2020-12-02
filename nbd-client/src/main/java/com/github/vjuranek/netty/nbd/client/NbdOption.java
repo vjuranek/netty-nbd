@@ -1,5 +1,7 @@
 package com.github.vjuranek.netty.nbd.client;
 
+import com.github.vjuranek.netty.nbd.client.option.AssertHandler;
+import com.github.vjuranek.netty.nbd.client.option.OptionHandler;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,7 +17,13 @@ public class NbdOption {
     public NbdOption(Channel channel, int option) {
         this.channel = channel;
         this.option = option;
-        this.handler = new OptionHandler(option);
+        this.handler = new AssertHandler(option);
+    }
+
+    public NbdOption(Channel channel, int option, OptionHandler handler) {
+        this.channel = channel;
+        this.option = option;
+        this.handler = handler;
     }
 
     public Channel getChannel() {

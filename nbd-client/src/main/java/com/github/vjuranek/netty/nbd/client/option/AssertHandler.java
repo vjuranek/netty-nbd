@@ -1,26 +1,14 @@
-package com.github.vjuranek.netty.nbd.client;
+package com.github.vjuranek.netty.nbd.client.option;
 
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
 
-public class OptionHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class AssertHandler extends OptionHandler {
 
-    private final int option;
-    // TODO: hash map entry for capacity higher than one and concurrent options.
-    private final BlockingDeque<byte[]> reply = new LinkedBlockingDeque<>(1);
-
-    public OptionHandler(int option) {
-        this.option = option;
-    }
-
-    public byte[] getReply() throws InterruptedException {
-        return reply.take();
+    public AssertHandler(int option) {
+        super(option);
     }
 
     @Override
