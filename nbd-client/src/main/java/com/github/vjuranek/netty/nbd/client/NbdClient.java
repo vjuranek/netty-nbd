@@ -1,7 +1,9 @@
 package com.github.vjuranek.netty.nbd.client;
 
+import com.github.vjuranek.netty.nbd.client.option.GoOption;
 import com.github.vjuranek.netty.nbd.client.option.NbdOption;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
+import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -38,11 +40,17 @@ public final class NbdClient {
         return structReply.getReply();
     }
 
+    public byte[] goOption(String exportName) throws InterruptedException {
+        GoOption go = new GoOption(this.channel, exportName);
+        go.send();
+        return go.getReply();
+    }
+
     public void close() {
-//        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
-//        cmd.send();
-        NbdOption abort = new NbdOption(this.channel, Constants.NBD_OPT_ABORT);
-        abort.send();
+        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
+        cmd.send();
+//        NbdOption abort = new NbdOption(this.channel, Constants.NBD_OPT_ABORT);
+//        abort.send();
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,7 +58,9 @@ public final class NbdClient {
         try {
             client = new NbdClient();
             byte[] reply = client.structuredReplyOption();
-            System.out.println("REPLY: " + new String(reply));
+            System.out.println("STRUCT OPT REPLY: " + new String(reply));
+            reply = client.goOption("test");
+            System.out.println("GO OPT REPLY: " + new String(reply));
             client.close();
         } catch(InterruptedException e) {
             // no-op
