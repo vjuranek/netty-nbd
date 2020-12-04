@@ -15,12 +15,18 @@ public final class Constants {
     public static final int NBD_FLAG_C_FIXED_NEWSTYLE = 0b00000001;
 
     public static final long OPTION_REPLAY_MAGIC = 0x3e889045565a9L;
-    public static final int NBD_REP_ACK = 1;
 
     // Options
     public static final int NBD_OPT_ABORT = 2;
     public static final int NBD_OPT_GO = 7;
     public static final int NBD_OPT_STRUCTURED_REPLY = 8;
+
+    // Option reply types
+    public static final int NBD_REP_ACK = 1;
+    public static final int NBD_INFO_BLOCK_SIZE = 3;
+
+    public static final int NBD_INFO_EXPORT = 0;
+
 
     // NBD commands
     public static final short NBD_CMD_READ = 0;

@@ -3,8 +3,11 @@ package com.github.vjuranek.netty.nbd.client;
 import com.github.vjuranek.netty.nbd.client.option.GoOption;
 import com.github.vjuranek.netty.nbd.client.option.NbdOption;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
+import com.github.vjuranek.netty.nbd.protocol.Phase;
 import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -20,7 +23,11 @@ public final class NbdClient {
 
     private final Channel channel;
 
+    private Phase phase;
+
     public NbdClient() throws  InterruptedException {
+        this.phase = Phase.HANDSHAKE;
+
         Bootstrap b = new Bootstrap();
         b.group(group)
                 .channel(NioSocketChannel.class)
@@ -40,10 +47,15 @@ public final class NbdClient {
         return structReply.getReply();
     }
 
-    public byte[] goOption(String exportName) throws InterruptedException {
+    public int goOption(String exportName) throws InterruptedException {
         GoOption go = new GoOption(this.channel, exportName);
         go.send();
-        return go.getReply();
+        byte[] reply = go.getReply();
+        int rc = Unpooled.buffer(4).writeBytes(reply).readInt();
+        if (rc == Constants.NBD_REP_ACK) {
+            this.phase = Phase.TRANSMISSION;
+        }
+        return rc;
     }
 
     public void close() {
@@ -59,8 +71,9 @@ public final class NbdClient {
             client = new NbdClient();
             byte[] reply = client.structuredReplyOption();
             System.out.println("STRUCT OPT REPLY: " + new String(reply));
-            reply = client.goOption("test");
-            System.out.println("GO OPT REPLY: " + new String(reply));
+            int rc = client.goOption("test");
+            System.out.println("GO OPT REPLY: " + rc);
+            System.out.println("client phase: " + client.phase);
             client.close();
         } catch(InterruptedException e) {
             // no-op
