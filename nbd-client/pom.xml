@@ -13,10 +13,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.jdk>1.8</version.jdk>
+        <java.main.class>com.github.vjuranek.netty.nbd.client.NbdClient</java.main.class>
+        <!-- versions -->
         <version.maven.compiler>3.3</version.maven.compiler>
         <version.maven.shade>2.4.3</version.maven.shade>
         <version.netty>4.1.53.Final</version.netty>
-        <java.main.class>com.github.vjuranek.netty.nbd.client.NbdClient</java.main.class>
+        <!-- versions of test dependencies -->
+        <version.junit>4.11</version.junit>
     </properties>
 
     <dependencies>
@@ -24,6 +27,14 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>${version.netty}</version>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
