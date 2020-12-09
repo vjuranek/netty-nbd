@@ -59,10 +59,16 @@ public final class NbdClient {
     }
 
     public void close() {
-        NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
-        cmd.send();
-//        NbdOption abort = new NbdOption(this.channel, Constants.NBD_OPT_ABORT);
-//        abort.send();
+        switch (this.phase) {
+            case HANDSHAKE:
+                NbdOption abort = new NbdOption(this.channel, Constants.NBD_OPT_ABORT);
+                abort.send();
+                break;
+            case TRANSMISSION:
+                NbdCommand cmd = new NbdCommand(this.channel, new DiscCmd());
+                cmd.send();
+                break;
+        }
     }
 
     public static void main(String[] args) throws Exception {
