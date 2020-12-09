@@ -6,7 +6,6 @@ import com.github.vjuranek.netty.nbd.protocol.Constants;
 import com.github.vjuranek.netty.nbd.protocol.Phase;
 import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

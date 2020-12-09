@@ -14,12 +14,12 @@ public class AssertHandler extends OptionHandler {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
 
-        long optionReplyMagic = msg.getLong(0);
-        int option = msg.getInt(8);
-        int reply = msg.getInt(12);
+        long optionReplyMagic = msg.readLong();
+        int option = msg.readInt();
+        int reply = msg.readInt();
         assertReply(optionReplyMagic, option, reply);
 
-        int replySize = msg.getInt(16);
+        int replySize = msg.readInt();
         byte[] content = new byte[replySize];
         msg.readBytes(content);
         this.reply.offer(content);

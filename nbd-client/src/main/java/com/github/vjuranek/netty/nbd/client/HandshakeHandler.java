@@ -10,9 +10,9 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        long nbdMagic = msg.getLong(0);
-        long iHaveOpt = msg.getLong(8);
-        short flags = msg.getShort(16);
+        long nbdMagic = msg.readLong();
+        long iHaveOpt = msg.readLong();
+        short flags = msg.readShort();
         assertReply(nbdMagic, iHaveOpt, flags);
 
         ByteBuf b = Unpooled.buffer(4);
