@@ -27,6 +27,9 @@ public final class Constants {
 
     public static final int NBD_INFO_EXPORT = 0;
 
+    public static final int INFO_BLOCK_SIZE_REPLY_LENGTH = 14;
+    public static final int INFO_EXPORT_REPLY_LENGTH = 12;
+
 
     // NBD commands
     public static final short NBD_CMD_READ = 0;

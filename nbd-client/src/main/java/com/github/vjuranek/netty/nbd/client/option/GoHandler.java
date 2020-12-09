@@ -34,16 +34,21 @@ public class GoHandler extends OptionHandler {
     private void handleNbdInfo(ByteBuf msg, int dataLength) {
         switch (msg.readShort()) {
             case Constants.NBD_INFO_BLOCK_SIZE:
-                if (dataLength != 14) {
-                    throw new IllegalStateException("Size of NBD_INFO_BLOCK_SIZE has to be 14, but got " + dataLength);
+                if (dataLength != Constants.INFO_BLOCK_SIZE_REPLY_LENGTH) {
+                    throw new IllegalStateException(String.format(
+                            "Size of NBD_INFO_BLOCK_SIZE reply has to be %d, but got %d",
+                            Constants.INFO_BLOCK_SIZE_REPLY_LENGTH,
+                            dataLength));
                 }
                 int minBlockSize = msg.readInt();
                 int prefferedBlockSize = msg.readInt();
                 int maxBlockSize = msg.readInt();
                 break;
             case Constants.NBD_INFO_EXPORT:
-                if (dataLength != 12) {
-                    throw new IllegalStateException("Size of NBD_INFO_EXPORT has to be 12, but got " + dataLength);
+                if (dataLength != Constants.INFO_EXPORT_REPLY_LENGTH) {
+                    throw new IllegalStateException(String.format("Size of NBD_INFO_EXPORT has to be %d, but got %d",
+                            Constants.INFO_EXPORT_REPLY_LENGTH,
+                            dataLength));
                 }
                 long exportSize = msg.readLong();
                 short flags = msg.readShort();
