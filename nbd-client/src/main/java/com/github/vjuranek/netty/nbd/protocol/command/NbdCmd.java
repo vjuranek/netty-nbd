@@ -18,6 +18,9 @@ import java.nio.ByteBuffer;
  * request message</a>
  */
 public class NbdCmd {
+
+    private static final int CMD_LENGTH= 158; // 32 + 16 + 16 + 64 + 64 + 32
+
     protected final short flags;
     protected final short type;
     protected final long handle;
@@ -38,7 +41,7 @@ public class NbdCmd {
     }
 
     public int length() {
-        return 158; // 32 + 16 + 16 + 64 + 64 + 32
+        return CMD_LENGTH;
     }
 
     public byte[] encode() {
