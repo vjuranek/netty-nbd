@@ -35,4 +35,8 @@ public final class Constants {
     public static final short NBD_CMD_READ = 0;
     public static final short NBD_CMD_WRITE = 1;
     public static final short NBD_CMD_DISC = 2;
+
+    // Replies
+    public static final int NBD_SIMPLE_REPLY_MAGIC = 0x67446698;
+    public static final int NBD_STRUCTURED_REPLY_MAGIC = 0x668e33ef;
 }
