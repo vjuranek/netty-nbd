@@ -5,7 +5,6 @@ import com.github.vjuranek.netty.nbd.protocol.Constants;
 import java.nio.ByteBuffer;
 
 /**
- *
  * 32 bits, 0x25609513, magic (NBD_REQUEST_MAGIC)
  * 16 bits, command flags
  * 16 bits, type
@@ -19,7 +18,7 @@ import java.nio.ByteBuffer;
  */
 public class NbdCmd {
 
-    private static final int CMD_LENGTH= 158; // 32 + 16 + 16 + 64 + 64 + 32
+    private static final int CMD_LENGTH = 158; // 32 + 16 + 16 + 64 + 64 + 32
 
     protected final short flags;
     protected final short type;
@@ -28,16 +27,36 @@ public class NbdCmd {
     protected final int length;
 
 
-    public NbdCmd(short flags, short type, long handle) {
+    public NbdCmd(final short flags, final short type, final long handle) {
         this(flags, type, handle, 0, 0);
     }
 
-    public NbdCmd(short flags, short type, long handle, long offset, int length) {
+    public NbdCmd(final short flags, final short type, final long handle, final long offset, final int length) {
         this.flags = flags;
         this.type = type;
         this.handle = handle;
         this.offset = offset;
         this.length = length;
+    }
+
+    public short getFlags() {
+        return flags;
+    }
+
+    public short getType() {
+        return type;
+    }
+
+    public long getHandle() {
+        return handle;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public int getLength() {
+        return length;
     }
 
     public int cmdLength() {
