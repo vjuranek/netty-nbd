@@ -40,12 +40,12 @@ public class NbdCmd {
         this.length = length;
     }
 
-    public int length() {
+    public int cmdLength() {
         return CMD_LENGTH;
     }
 
     public byte[] encode() {
-        ByteBuffer cmd = ByteBuffer.allocate(length());
+        ByteBuffer cmd = ByteBuffer.allocate(cmdLength());
         cmd.putInt(Constants.NBD_REQUEST_MAGIC);
         cmd.putShort(flags);
         cmd.putShort(type);

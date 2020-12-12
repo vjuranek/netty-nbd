@@ -21,7 +21,7 @@ public class NbdCommand {
     }
 
     public void send() {
-        ByteBuf b = Unpooled.buffer(command.length());
+        ByteBuf b = Unpooled.buffer(command.cmdLength());
         b.writeBytes(command.encode());
 
         ChannelFuture f = getChannel().pipeline().writeAndFlush(b);
