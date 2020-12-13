@@ -1,6 +1,8 @@
 package com.github.vjuranek.netty.nbd.protocol.command;
 
 import com.github.vjuranek.netty.nbd.protocol.Constants;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.nio.ByteBuffer;
 
@@ -72,5 +74,16 @@ public class NbdCmd {
         cmd.putLong(offset);
         cmd.putInt(length);
         return cmd.array();
+    }
+
+    public ByteBuf asBuffer() {
+        ByteBuf cmd = Unpooled.buffer(cmdLength());
+        cmd.writeInt(Constants.NBD_REQUEST_MAGIC);
+        cmd.writeShort(flags);
+        cmd.writeShort(type);
+        cmd.writeLong(handle);
+        cmd.writeLong(offset);
+        cmd.writeInt(length);
+        return cmd;
     }
 }

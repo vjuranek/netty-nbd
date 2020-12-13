@@ -1,10 +1,7 @@
 package com.github.vjuranek.netty.nbd.client;
 
 import com.github.vjuranek.netty.nbd.protocol.command.NbdCmd;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 
 public class NbdCommand {
 
@@ -21,10 +18,6 @@ public class NbdCommand {
     }
 
     public void send() {
-        ByteBuf b = Unpooled.buffer(command.cmdLength());
-        b.writeBytes(command.encode());
-
-        ChannelFuture f = getChannel().pipeline().writeAndFlush(b);
-        f.addListener(Utils.writeFailed);
+        getChannel().pipeline().writeAndFlush(command.asBuffer()).addListener(Utils.writeFailed);
     }
 }
