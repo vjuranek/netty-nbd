@@ -2,7 +2,7 @@ package com.github.vjuranek.netty.nbd.protocol.command;
 
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Read command (NBD_CMD_READ).
@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ReadCmd extends NbdCmd {
 
-    private static AtomicInteger handle = new AtomicInteger(0);
+    private static AtomicLong handle = new AtomicLong(0);
 
-    public static int nextHandle() {
+    public static long nextHandle() {
         return handle.incrementAndGet();
     }
 
