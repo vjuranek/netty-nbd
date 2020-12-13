@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
  */
 public class NbdCmd {
 
-    private static final int CMD_LENGTH = 158; // 32 + 16 + 16 + 64 + 64 + 32
+    private static final int CMD_LENGTH = 28; // (32 + 16 + 16 + 64 + 64 + 32) / 8
 
     protected final short flags;
     protected final short type;
