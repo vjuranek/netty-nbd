@@ -17,18 +17,13 @@ import java.util.Arrays;
  * @see <a href="https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md#simple-reply-message">
  * Simple reply message</a>
  */
-public class SimpleReply {
+public class SimpleReply implements NbdReply {
 
     private final int error;
     private final long handle;
     private final byte[] data;
 
     public SimpleReply(ByteBuf msg, int length) throws IllegalStateException {
-        int magic = msg.readInt();
-        if (magic != Constants.NBD_SIMPLE_REPLY_MAGIC) {
-            throw new IllegalStateException(String.format("Unexpected reply magic, expected %x, but got %x.",
-                    Constants.NBD_SIMPLE_REPLY_MAGIC, magic));
-        }
         this.error = msg.readInt();
         this.handle = msg.readLong();
         if ((length != 0) && (this.error == 0)) {
@@ -43,10 +38,12 @@ public class SimpleReply {
         return error;
     }
 
+    @Override
     public long getHandle() {
         return handle;
     }
 
+    @Override
     public byte[] getData() {
         return data;
     }

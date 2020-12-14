@@ -1,10 +1,12 @@
 package com.github.vjuranek.netty.nbd.client;
 
+import com.github.vjuranek.netty.nbd.client.command.ReadHandler;
 import com.github.vjuranek.netty.nbd.client.option.GoOption;
 import com.github.vjuranek.netty.nbd.client.option.NbdOption;
 import com.github.vjuranek.netty.nbd.protocol.Constants;
 import com.github.vjuranek.netty.nbd.protocol.Phase;
 import com.github.vjuranek.netty.nbd.protocol.command.DiscCmd;
+import com.github.vjuranek.netty.nbd.protocol.command.ReadCmd;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -57,6 +59,19 @@ public final class NbdClient {
         return rc;
     }
 
+    public byte[] read(long offset, int length) throws IllegalStateException, InterruptedException {
+        if (this.phase != Phase.TRANSMISSION) {
+            throw new IllegalStateException("Cannot send READ command if not in transmission phase.");
+        }
+
+        ReadCmd readCmd = new ReadCmd(offset, length);
+        ReadHandler handler = new ReadHandler(readCmd.getHandle());
+        this.channel.pipeline().addLast(handler);
+        NbdCommand cmd = new NbdCommand(this.channel, readCmd);
+        cmd.send();
+        return handler.getReply().getData();
+    }
+
     public void close() {
         switch (this.phase) {
             case HANDSHAKE:
@@ -79,6 +94,12 @@ public final class NbdClient {
             int rc = client.goOption("test");
             System.out.println("GO OPT REPLY: " + rc);
             System.out.println("client phase: " + client.phase);
+            // TODO: has to be less than 1004 bytes (20 bytes header + 1004 - some Netty buffer with default 1024B ?)
+            byte[] data = client.read(0L, 512);
+            for (byte b : data) {
+                System.out.printf("%x", b);
+            }
+            System.out.println();
             client.close();
         } catch(InterruptedException e) {
             // no-op

@@ -19,7 +19,7 @@ import java.util.Arrays;
  * @see <a href="https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md#structured-reply-chunk-message">
  * Structured reply chunk message.</a>
  */
-public class StructuredReply {
+public class StructuredReply implements NbdReply {
 
     private final short flags;
     private final short type;
@@ -28,17 +28,16 @@ public class StructuredReply {
     private final byte[] data;
 
     public StructuredReply(ByteBuf msg) throws IllegalStateException {
-        int magic = msg.readInt();
-        if (magic != Constants.NBD_STRUCTURED_REPLY_MAGIC) {
-            throw new IllegalStateException(String.format("Unexpected reply magic, expected %x, but got %x.",
-                    Constants.NBD_STRUCTURED_REPLY_MAGIC, magic));
-        }
         this.flags = msg.readShort();
         this.type = msg.readShort();
         this.handle = msg.readLong();
         this.length = msg.readInt();
-        if (this.length != 0) {
-            this.data = new byte[this.length];
+        if (this.length > 0) {
+            if (msg.readableBytes() != this.length) {
+                throw new IllegalStateException(String.format("Payload size is %d, but readable bytes only %d",
+                        this.length, msg.readableBytes()));
+            }
+            this.data = new byte[msg.readableBytes()];
             msg.readBytes(this.data);
         } else {
             this.data = null;
@@ -53,6 +52,7 @@ public class StructuredReply {
         return type;
     }
 
+    @Override
     public long getHandle() {
         return handle;
     }
@@ -61,6 +61,7 @@ public class StructuredReply {
         return length;
     }
 
+    @Override
     public byte[] getData() {
         return data;
     }
