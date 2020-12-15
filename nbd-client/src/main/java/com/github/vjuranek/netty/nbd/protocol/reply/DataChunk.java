@@ -11,7 +11,7 @@ public class DataChunk implements NbdReply {
     public DataChunk(long handle, byte[] payload) {
         this.handle = handle;
         this.offset = ByteBuffer.wrap(Arrays.copyOf(payload, 8)).getLong();
-        this.data = Arrays.copyOfRange(payload, 8, payload.length - 8);
+        this.data = Arrays.copyOfRange(payload, 8, payload.length);
     }
 
     @Override
