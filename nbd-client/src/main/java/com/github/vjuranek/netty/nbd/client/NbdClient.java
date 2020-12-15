@@ -69,7 +69,15 @@ public final class NbdClient {
         this.channel.pipeline().addLast(handler);
         NbdCommand cmd = new NbdCommand(this.channel, readCmd);
         cmd.send();
-        return handler.getReply().getData();
+
+        byte[] reply = new byte[length];
+        int read = 0;
+        while (read != length) {
+            byte[] chunk = handler.getReply().getData();
+            System.arraycopy(chunk, 0, reply, read, chunk.length);
+            read += chunk.length;
+        }
+        return reply;
     }
 
     public void close() {
@@ -95,7 +103,7 @@ public final class NbdClient {
             System.out.println("GO OPT REPLY: " + rc);
             System.out.println("client phase: " + client.phase);
             // TODO: has to be less than 1004 bytes (20 bytes header + 1004 - some Netty buffer with default 1024B ?)
-            byte[] data = client.read(0L, 512);
+            byte[] data = client.read(0L, 2048);
             for (byte b : data) {
                 System.out.printf("%x", b);
             }

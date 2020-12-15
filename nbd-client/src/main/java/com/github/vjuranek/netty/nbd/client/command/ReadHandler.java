@@ -11,10 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
  * TODO:
  * - handle errors
  * - redesign for parallel/async usage
- * - fix read handler to be able to read longer replies - with default setup
- *   Netty reads only 1024B which results into maximum data chunk of 1004B
- *   (20 bytes is header). Handler should be able to handle multiple
- *   channelRead events and continue with reading until whole reply is read.
+ * - allow to handle multiple data chunks send by NBD server (need to check NBD_REPLY_FLAG_DONE for data chunks)
  */
 public class ReadHandler extends CommandHandler {
 
@@ -29,36 +26,64 @@ public class ReadHandler extends CommandHandler {
     private final long handle;
     private final int length; // length of simple reply message
 
+    private boolean firstChunk;
+    private ReplyMagic replyMagic;
+    private short replyFlags;
+    private short replyType;
+
     public ReadHandler(long handle) {
         this.handle = handle;
         this.length = 0;
+        this.firstChunk = true;
     }
 
     public ReadHandler(long handle, int length) {
         this.handle = handle;
         this.length = length;
+        this.firstChunk = true;
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        if (this.firstChunk) {
+            int replyMagic = msg.readInt();
+            switch (replyMagic) {
+                case NBD_SIMPLE_REPLY_MAGIC:
+                    this.replyMagic = ReplyMagic.SIMPLE_REPLY;
+                    break;
+                case NBD_STRUCTURED_REPLY_MAGIC:
+                    this.replyMagic = ReplyMagic.STRUCTURED_REPLY;
+                    break;
+                default:
+                    throw new IllegalStateException(String.format("Unknown read reply magic %x", replyMagic));
+            }
+        }
+
         NbdReply reply;
-        int replyMagic = msg.readInt();
-        switch (replyMagic) {
-            case NBD_SIMPLE_REPLY_MAGIC:
+        switch (this.replyMagic) {
+            case SIMPLE_REPLY:
+                this.replyMagic = ReplyMagic.SIMPLE_REPLY;
                 reply = new SimpleReply(msg, this.length);
                 if (this.handle == reply.getHandle()) {
                     this.reply.offer(reply);
                 }
                 break;
-            case NBD_STRUCTURED_REPLY_MAGIC:
-                reply = new StructuredReply(msg);
+            case STRUCTURED_REPLY:
+                this.replyMagic = ReplyMagic.STRUCTURED_REPLY;
+                if (this.firstChunk) {
+                    reply = new StructuredReply(msg);
+                    this.replyFlags = ((StructuredReply) reply).getFlags();
+                    this.replyType = ((StructuredReply) reply).getType();
+                } else {
+                    reply = new StructuredReply(msg, this.replyFlags, this.replyType, this.handle);
+                }
                 if (this.handle == reply.getHandle()) {
                     handleStructuredReply((StructuredReply) reply);
                 }
                 break;
-            default:
-                throw new IllegalStateException(String.format("Unknown read reply magic %x", replyMagic));
         }
+
+        this.firstChunk = false;
     }
 
     private void handleStructuredReply(StructuredReply reply) {
@@ -69,11 +94,16 @@ public class ReadHandler extends CommandHandler {
                 }
                 break;
             case NBD_REPLY_TYPE_OFFSET_DATA:
-                this.reply.offer(new DataChunk(this.handle, reply.getData()));
+                this.reply.offer(new DataChunk(this.handle, reply.getData(), this.firstChunk));
                 break;
             default:
                 throw new IllegalStateException("Unknown reply type " + reply.getType());
         }
+    }
+
+    private enum ReplyMagic {
+        SIMPLE_REPLY,
+        STRUCTURED_REPLY
     }
 
 }

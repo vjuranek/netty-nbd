@@ -8,10 +8,15 @@ public class DataChunk implements NbdReply {
     private final long offset;
     private final byte[] data;
 
-    public DataChunk(long handle, byte[] payload) {
+    public DataChunk(long handle, byte[] payload, boolean isOffset) {
         this.handle = handle;
-        this.offset = ByteBuffer.wrap(Arrays.copyOf(payload, 8)).getLong();
-        this.data = Arrays.copyOfRange(payload, 8, payload.length);
+        if (isOffset) {
+            this.offset = ByteBuffer.wrap(Arrays.copyOf(payload, 8)).getLong();
+            this.data = Arrays.copyOfRange(payload, 8, payload.length);
+        } else {
+            this.offset = -1;
+            this.data = Arrays.copyOfRange(payload, 0, payload.length);
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.github.vjuranek.netty.nbd.protocol.reply;
 
-import com.github.vjuranek.netty.nbd.protocol.Constants;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Arrays;
@@ -33,11 +32,20 @@ public class StructuredReply implements NbdReply {
         this.handle = msg.readLong();
         this.length = msg.readInt();
         if (this.length > 0) {
-            if (msg.readableBytes() != this.length) {
-                throw new IllegalStateException(String.format("Payload size is %d, but readable bytes only %d",
-                        this.length, msg.readableBytes()));
-            }
             this.data = new byte[msg.readableBytes()];
+            msg.readBytes(this.data);
+        } else {
+            this.data = null;
+        }
+    }
+
+    public StructuredReply(ByteBuf msg, short flags, short type, long handle) throws IllegalStateException {
+        this.flags = flags;
+        this.type = type;
+        this.handle = handle;
+        this.length = msg.readableBytes();
+        if (this.length > 0) {
+            this.data = new byte[this.length];
             msg.readBytes(this.data);
         } else {
             this.data = null;
