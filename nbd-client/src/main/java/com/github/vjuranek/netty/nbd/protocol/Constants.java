@@ -2,7 +2,6 @@ package com.github.vjuranek.netty.nbd.protocol;
 
 /**
  * NBD protocol constants.
- *
  */
 public final class Constants {
     public static final int NBD_PORT = 10809;

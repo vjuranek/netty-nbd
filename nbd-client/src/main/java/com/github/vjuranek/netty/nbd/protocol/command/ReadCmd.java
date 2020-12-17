@@ -19,7 +19,7 @@ public class ReadCmd extends NbdCmd {
     }
 
     public ReadCmd(final long offset, final int length) {
-        super((short)0, Constants.NBD_CMD_READ, nextHandle(), offset, length);
+        super((short) 0, Constants.NBD_CMD_READ, nextHandle(), offset, length);
     }
 
     public ReadCmd(final short flags, final long handle, final long offset, final int length) {

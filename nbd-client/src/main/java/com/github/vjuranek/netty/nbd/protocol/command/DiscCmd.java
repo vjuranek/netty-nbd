@@ -8,7 +8,7 @@ import com.github.vjuranek.netty.nbd.protocol.Constants;
 public class DiscCmd extends NbdCmd {
 
     public DiscCmd() {
-        super((short) 0, Constants.NBD_CMD_DISC, (short)0);
+        super((short) 0, Constants.NBD_CMD_DISC, (short) 0);
     }
 
     public DiscCmd(short flags, long handle) {

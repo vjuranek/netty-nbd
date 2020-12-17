@@ -26,7 +26,7 @@ public final class NbdClient {
 
     private Phase phase;
 
-    public NbdClient() throws  InterruptedException {
+    public NbdClient() throws InterruptedException {
         this.phase = Phase.HANDSHAKE;
 
         Bootstrap b = new Bootstrap();
@@ -102,14 +102,16 @@ public final class NbdClient {
             int rc = client.goOption("test");
             System.out.println("GO OPT REPLY: " + rc);
             System.out.println("client phase: " + client.phase);
-            // TODO: has to be less than 1004 bytes (20 bytes header + 1004 - some Netty buffer with default 1024B ?)
             byte[] data = client.read(0L, 2048);
             for (byte b : data) {
-                System.out.printf("%x", b);
+                if (b < 33 || b > 126) {
+                    b = '.';
+                }
+                System.out.printf("%c", (char) b);
             }
             System.out.println();
             client.close();
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             // no-op
         } finally {
             shutdown();

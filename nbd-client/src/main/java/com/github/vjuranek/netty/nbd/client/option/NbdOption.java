@@ -30,7 +30,7 @@ public class NbdOption {
     }
 
     public void send() {
-        send(new byte[] {});
+        send(new byte[]{});
     }
 
     public void send(byte[] data) {

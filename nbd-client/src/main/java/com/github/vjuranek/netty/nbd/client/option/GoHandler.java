@@ -55,7 +55,6 @@ public class GoHandler extends OptionHandler {
                 break;
             default:
                 msg.readBytes(dataLength);
-                //throw new IllegalStateException("Unsupported info option " + info_type);
         }
     }
 
