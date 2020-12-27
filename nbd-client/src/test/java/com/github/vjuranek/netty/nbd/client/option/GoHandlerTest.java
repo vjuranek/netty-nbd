@@ -7,6 +7,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GoHandlerTest {
 
@@ -93,6 +94,29 @@ public class GoHandlerTest {
             throw new AssertionError("Handler should throw an exception");
         } catch (IllegalStateException e) {
             assertEquals("Size of NBD_INFO_EXPORT has to be 12, but got 11", e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testNbdInfoNoReadableBytes() throws InterruptedException {
+        GoHandler goHandler = new GoHandler();
+        EmbeddedChannel channel = new EmbeddedChannel(goHandler);
+
+        ByteBuf buf = Unpooled.buffer(20);
+        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_REP_ACK);
+        buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH - 1);
+        // Assume malformed message - write just one byte
+        buf.writeByte(0);
+
+        try {
+            channel.writeInbound(buf);
+            // TODO: wait for a short time? The calls are async.
+            throw new AssertionError("Handler should throw an exception");
+        } catch (IndexOutOfBoundsException e) {
+            assertTrue(e.getMessage().startsWith("readerIndex(20) + length(2) exceeds writerIndex(21)"));
         }
 
     }

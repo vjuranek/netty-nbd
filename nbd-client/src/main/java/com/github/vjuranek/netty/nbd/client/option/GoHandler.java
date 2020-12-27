@@ -20,7 +20,7 @@ public class GoHandler extends OptionHandler {
             rc = msg.readInt();
             int length = msg.readInt();
 
-            if (msg.readableBytes() > 1) {
+            if (msg.readableBytes() > 0) {
                 handleNbdInfo(msg, length);
             }
         }
