@@ -107,7 +107,7 @@ public class GoHandlerTest {
         buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
-        buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH - 1);
+        buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
         // Assume malformed message - write just one byte
         buf.writeByte(0);
 
@@ -117,6 +117,29 @@ public class GoHandlerTest {
             throw new AssertionError("Handler should throw an exception");
         } catch (IndexOutOfBoundsException e) {
             assertTrue(e.getMessage().startsWith("readerIndex(20) + length(2) exceeds writerIndex(21)"));
+        }
+
+    }
+
+    @Test
+    public void testWrongMagic() throws InterruptedException {
+        GoHandler goHandler = new GoHandler();
+        EmbeddedChannel channel = new EmbeddedChannel(goHandler);
+
+        ByteBuf buf = Unpooled.buffer(20);
+        // Wrong reply magic.
+        buf.writeLong(0L);
+        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_REP_ACK);
+        buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
+        buf.writeByte(0);
+
+        try {
+            channel.writeInbound(buf);
+            // TODO: wait for a short time? The calls are async.
+            throw new AssertionError("Handler should throw an exception");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Expected option reply magic, but got 0"));
         }
 
     }
