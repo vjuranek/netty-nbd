@@ -17,6 +17,7 @@ public final class Constants {
 
     // Options
     public static final int NBD_OPT_ABORT = 2;
+    public static final int NBD_OPT_INFO = 6;
     public static final int NBD_OPT_GO = 7;
     public static final int NBD_OPT_STRUCTURED_REPLY = 8;
 
