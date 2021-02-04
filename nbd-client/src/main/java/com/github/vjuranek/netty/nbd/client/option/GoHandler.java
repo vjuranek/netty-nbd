@@ -14,9 +14,10 @@ public class GoHandler extends OptionHandler {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         int rc = 0;
+        int replOption = 0;
         while (rc != Constants.NBD_REP_ACK) {
             long optionReplyMagic = msg.readLong();
-            int option = msg.readInt();
+            replOption = msg.readInt();
             rc = msg.readInt();
             int length = msg.readInt();
 
@@ -28,9 +29,12 @@ public class GoHandler extends OptionHandler {
                 handleNbdInfo(msg, length);
             }
         }
-        ByteBuf reply = Unpooled.buffer(4);
-        reply.writeInt(rc);
-        this.reply.offer(reply.array());
+
+        if (replOption == Constants.NBD_OPT_GO) {
+            ByteBuf reply = Unpooled.buffer(4);
+            reply.writeInt(rc);
+            this.reply.offer(reply.array());
+        }
 
         ctx.pipeline().remove(this);
     }
