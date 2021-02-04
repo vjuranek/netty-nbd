@@ -17,7 +17,7 @@ public class GoHandlerTest {
         EmbeddedChannel channel = new EmbeddedChannel(goHandler);
 
         ByteBuf buf = Unpooled.buffer(20);
-        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(0);
@@ -37,7 +37,7 @@ public class GoHandlerTest {
         EmbeddedChannel channel = new EmbeddedChannel(goHandler);
 
         ByteBuf buf = Unpooled.buffer(20);
-        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
@@ -59,7 +59,7 @@ public class GoHandlerTest {
         EmbeddedChannel channel = new EmbeddedChannel(goHandler);
 
         ByteBuf buf = Unpooled.buffer(20);
-        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
@@ -80,7 +80,7 @@ public class GoHandlerTest {
         EmbeddedChannel channel = new EmbeddedChannel(goHandler);
 
         ByteBuf buf = Unpooled.buffer(20);
-        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH - 1);
@@ -104,7 +104,7 @@ public class GoHandlerTest {
         EmbeddedChannel channel = new EmbeddedChannel(goHandler);
 
         ByteBuf buf = Unpooled.buffer(20);
-        buf.writeLong(Constants.NBD_STRUCTURED_REPLY_MAGIC);
+        buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
         buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);

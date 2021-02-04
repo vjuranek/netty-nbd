@@ -21,7 +21,7 @@ public class GoHandler extends OptionHandler {
             rc = msg.readInt();
             int length = msg.readInt();
 
-            if (optionReplyMagic != Constants.NBD_STRUCTURED_REPLY_MAGIC) {
+            if (optionReplyMagic != Constants.OPTION_REPLAY_MAGIC) {
                 throw new IllegalArgumentException(String.format("Expected option reply magic, but got %x", optionReplyMagic));
             }
 
