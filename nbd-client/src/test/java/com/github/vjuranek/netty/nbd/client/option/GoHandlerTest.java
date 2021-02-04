@@ -18,7 +18,7 @@ public class GoHandlerTest {
 
         ByteBuf buf = Unpooled.buffer(20);
         buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(0);
 
@@ -38,7 +38,7 @@ public class GoHandlerTest {
 
         ByteBuf buf = Unpooled.buffer(20);
         buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
         buf.writeShort(Constants.NBD_INFO_EXPORT);
@@ -60,7 +60,7 @@ public class GoHandlerTest {
 
         ByteBuf buf = Unpooled.buffer(20);
         buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
         buf.writeShort(Constants.NBD_INFO_EXPORT);
@@ -81,7 +81,7 @@ public class GoHandlerTest {
 
         ByteBuf buf = Unpooled.buffer(20);
         buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH - 1);
         buf.writeShort(Constants.NBD_INFO_EXPORT);
@@ -105,7 +105,7 @@ public class GoHandlerTest {
 
         ByteBuf buf = Unpooled.buffer(20);
         buf.writeLong(Constants.OPTION_REPLAY_MAGIC);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
         // Assume malformed message - write just one byte
@@ -129,7 +129,7 @@ public class GoHandlerTest {
         ByteBuf buf = Unpooled.buffer(20);
         // Wrong reply magic.
         buf.writeLong(0L);
-        buf.writeInt(Constants.NBD_OPT_STRUCTURED_REPLY);
+        buf.writeInt(Constants.NBD_OPT_GO);
         buf.writeInt(Constants.NBD_REP_ACK);
         buf.writeInt(Constants.INFO_EXPORT_REPLY_LENGTH);
         buf.writeByte(0);
