@@ -1,5 +1,6 @@
 package com.github.vjuranek.netty.nbd.client.command;
 
+import com.github.vjuranek.netty.nbd.protocol.Constants;
 import com.github.vjuranek.netty.nbd.protocol.reply.DataChunk;
 import com.github.vjuranek.netty.nbd.protocol.reply.NbdReply;
 import com.github.vjuranek.netty.nbd.protocol.reply.SimpleReply;
@@ -14,9 +15,6 @@ import io.netty.channel.ChannelHandlerContext;
  * - allow to handle multiple data chunks send by NBD server (need to check NBD_REPLY_FLAG_DONE for data chunks)
  */
 public class ReadHandler extends CommandHandler {
-
-    public static final int NBD_SIMPLE_REPLY_MAGIC = 0x67446698;
-    public static final int NBD_STRUCTURED_REPLY_MAGIC = 0x668e33ef;
 
     public static final short NBD_REPLY_TYPE_NONE = 0;
     public static final short NBD_REPLY_TYPE_OFFSET_DATA = 1;
@@ -48,10 +46,10 @@ public class ReadHandler extends CommandHandler {
         if (this.firstChunk) {
             int replyMagic = msg.readInt();
             switch (replyMagic) {
-                case NBD_SIMPLE_REPLY_MAGIC:
+                case Constants.NBD_SIMPLE_REPLY_MAGIC:
                     this.replyMagic = ReplyMagic.SIMPLE_REPLY;
                     break;
-                case NBD_STRUCTURED_REPLY_MAGIC:
+                case Constants.NBD_STRUCTURED_REPLY_MAGIC:
                     this.replyMagic = ReplyMagic.STRUCTURED_REPLY;
                     break;
                 default:
